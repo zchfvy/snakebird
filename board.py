@@ -42,6 +42,10 @@ def load_board(fname):
                     row.append('block 4')
                 elif char == '5':
                     row.append('block 5')
+                elif char == 'F':
+                    row.append('fruit')
+                elif char == 'X':
+                    row.append('telep')
                 elif char == '\n':
                     continue
                 else:
@@ -74,6 +78,10 @@ def draw_board(board, color=True):
                 rowchars.append('\u2588')
             elif elclass == 'spike':
                 rowchars.append('\u271A')
+            elif elclass == 'telep':
+                rowchars.append('\u2609')
+            elif elclass == 'fruit':
+                rowchars.append('\u2764')
             elif elclass == 'snake':
                 clr = elem[6:9]
                 if color:
