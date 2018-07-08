@@ -9,11 +9,13 @@ class SnakebirdBoardError(Exception):
 def load_board(fname):
     board = []
     rowlen = 0
+    heads = []
     with open(fname, 'r') as f:
-        for line in f:
+        line_num = 0
+        for y, line in enumerate(f):
             row = []
             board.append(row)
-            for char in line:
+            for x, char in enumerate(line):
                 if char == ' ':
                     row.append('space')
                 elif char == '#':
@@ -21,11 +23,14 @@ def load_board(fname):
                 elif char == '+':
                     row.append('spike')
                 elif char == 'R':
-                    row.append('snake red head')
+                    row.append('snake red 0')
+                    heads.append((x,y))
                 elif char == 'G':
-                    row.append('snake grn head')
+                    row.append('snake grn 0')
+                    heads.append((x,y))
                 elif char == 'B':
-                    row.append('snake blu head')
+                    row.append('snake blu 0')
+                    heads.append((x,y))
                 elif char == 'r':
                     row.append('snake red')
                 elif char == 'g':
@@ -49,11 +54,33 @@ def load_board(fname):
                 elif char == '\n':
                     continue
                 else:
-                    raise SnakebirdBoardError(
-                            f"Unknown char '{char}'")
+                    raise SnakebirdBoardError(f"Unknown char '{char}'")
             if rowlen != 0 and len(row) != rowlen:
-                raise SnakebirdBoardError(
-                        "Ragged array for level!")
+                raise SnakebirdBoardError("Ragged array for level!")
+            rowlen = len(row)
+    numrows = len(board)
+
+    for x, y in heads:
+        snake = board[y][x][6:9]
+        index = 0
+        while True:
+            index = index + 1
+            # Left
+            adjecents = [(y-1, x), (y+1, x), (y, x-1), (y, x+1)]
+            for ay, ax in adjecents:
+                if not (0 <= ax < rowlen) or not (0 <= ay < numrows):
+                    continue
+                adj = board[ay][ax]
+                if adj[0:5] == 'snake' and adj[6:9] == snake:
+                    if len(adj) >= 11:
+                        continue # already visited!
+                    board[y][x] = board[y][x] + f" {ay} {ax}"
+                    board[ay][ax] = board[ay][ax] + f" {index}"
+                    x, y = ax, ay
+                    break
+            else:
+                # No more segents found!
+                break
 
     return board
 
@@ -91,7 +118,7 @@ def draw_board(board, color=True):
                         rowchars.append(COLOR_BLU)
                     elif clr == 'blu':
                         rowchars.append(COLOR_GRN)
-                if elem[-4:] == 'head':
+                if elem[10] == '0':
                     rowchars.append('\u263A')
                 else:
                     rowchars.append('\u25A0')
