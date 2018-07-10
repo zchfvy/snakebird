@@ -109,7 +109,13 @@ def move_board_state(board, snake, direction):
 
     elif blocker == 'endpt':
         # We check for fruits, then delete the snake
-        raise NotImplemented()
+        for row in board:
+            for elem in row:
+                if elem == 'fruit':
+                    # TODO : Portal shouldnt actualy block you if
+                    # you dont have enough fruits
+                    raise IllegalMove()
+        raise MissionComplete()
 
     elif blocker == 'solid' or blocker == 'spikes':
         # No can do
@@ -162,7 +168,7 @@ if __name__ == '__main__':
             except MissionComplete:
                 print("YOU'RE WINNER")
                 exit(0)
-        if move == 'q':
+        elif move == 'q':
             exit(0)
         else:
             print(dedent("""
