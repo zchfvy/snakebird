@@ -11,7 +11,6 @@ def load_board(fname):
     rowlen = 0
     heads = []
     with open(fname, 'r') as f:
-        line_num = 0
         for y, line in enumerate(f):
             row = []
             board.append(row)
@@ -22,15 +21,17 @@ def load_board(fname):
                     row.append('solid')
                 elif char == '+':
                     row.append('spike')
+                elif char == 'O':
+                    row.append('endpt')
                 elif char == 'R':
                     row.append('snake red 0')
-                    heads.append((x,y))
+                    heads.append((x, y))
                 elif char == 'G':
                     row.append('snake grn 0')
-                    heads.append((x,y))
+                    heads.append((x, y))
                 elif char == 'B':
                     row.append('snake blu 0')
-                    heads.append((x,y))
+                    heads.append((x, y))
                 elif char == 'r':
                     row.append('snake red')
                 elif char == 'g':
@@ -73,7 +74,7 @@ def load_board(fname):
                 adj = board[ay][ax]
                 if adj[0:5] == 'snake' and adj[6:9] == snake:
                     if len(adj) >= 11:
-                        continue # already visited!
+                        continue  # already visited!
                     board[y][x] = board[y][x] + f" {ay} {ax}"
                     board[ay][ax] = board[ay][ax] + f" {index}"
                     x, y = ax, ay
@@ -109,6 +110,8 @@ def draw_board(board, color=True):
                 rowchars.append('\u2609')
             elif elclass == 'fruit':
                 rowchars.append('\u2764')
+            elif elclass == 'endpt':
+                rowchars.append('\u269D')
             elif elclass == 'snake':
                 clr = elem[6:9]
                 if color:
