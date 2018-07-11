@@ -8,6 +8,8 @@ class SnakebirdBoardError(Exception):
 
 def load_board(fname):
     board = []
+    teleports = []
+    endpoint = None
     rowlen = 0
     heads = []
     with open(fname, 'r') as f:
@@ -21,8 +23,6 @@ def load_board(fname):
                     row.append('solid')
                 elif char == '+':
                     row.append('spike')
-                elif char == 'O':
-                    row.append('endpt')
                 elif char == 'R':
                     row.append('snake red 0')
                     heads.append((x, y))
@@ -51,7 +51,13 @@ def load_board(fname):
                 elif char == 'F':
                     row.append('fruit')
                 elif char == 'X':
-                    row.append('telep')
+                    teleports.append((y,x))
+                    row.append('space')
+                elif char == 'O':
+                    row.append('space')
+                    if endpoint is not None:
+                        raise SnakebirdBoardError("Multiple Endpoints")
+                    endpoint = (y, x)
                 elif char == '\n':
                     continue
                 else:
@@ -83,7 +89,7 @@ def load_board(fname):
                 # No more segents found!
                 break
 
-    return board
+    return board, teleports, endpoint
 
 
 COLOR_RST = '\033[39m'
@@ -95,23 +101,24 @@ COLOR_MAG = '\033[35m'
 COLOR_CYA = '\033[36m'
 
 
-def draw_board(board, color=True):
-    for row in board:
+def draw_board(board, teleports, endpoint, color=True):
+    for y, row in enumerate(board):
         rowchars = []
-        for elem in row:
+        for x, elem in enumerate(row):
             elclass = elem[0:5]
             if elclass == 'space':
-                rowchars.append(' ')
+                if endpoint == (y, x):
+                    rowchars.append('\u269D')
+                elif (y,x) in teleports:
+                    rowchars.append('\u2609')
+                else:
+                    rowchars.append(' ')
             elif elclass == 'solid':
                 rowchars.append('\u2588')
             elif elclass == 'spike':
                 rowchars.append('\u271A')
-            elif elclass == 'telep':
-                rowchars.append('\u2609')
             elif elclass == 'fruit':
                 rowchars.append('\u2764')
-            elif elclass == 'endpt':
-                rowchars.append('\u269D')
             elif elclass == 'snake':
                 clr = elem[6:9]
                 if color:
@@ -149,4 +156,4 @@ def draw_board(board, color=True):
 if __name__ == '__main__':
     import sys
     board = load_board(sys.argv[1])
-    draw_board(board)
+    draw_board(*board)

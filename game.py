@@ -23,7 +23,7 @@ class MissionComplete(Exception):
     """We are done!"""
 
 
-def move_board_state(board, snake, direction):
+def move_board_state(board, teleports, endpoint, snake, direction):
     board = copy.deepcopy(board)
     b_x, b_y = len(board[0]), len(board)
 
@@ -83,6 +83,18 @@ def move_board_state(board, snake, direction):
                 break
 
     elif blocker == 'space':
+
+        # First check if this sapce contains the endpoint, adn do that
+        # logic
+        if (t_y, t_x) == endpoint:
+            fruits_left = 0
+            for row in board:
+                for elem in row:
+                    if elem == 'fruit':
+                        fruits_left += 1
+            if fruits_left == 0:
+                raise MissionComplete()
+
         # We advance the snake's head
         segment = 0
         board[t_y][t_x] = f'snake {snake} {segment} {y} {x}'
@@ -104,19 +116,6 @@ def move_board_state(board, snake, direction):
                 board[y][x] = f'space'
                 break
 
-    elif blocker == 'telep':
-        raise NotImplemented()
-
-    elif blocker == 'endpt':
-        # We check for fruits, then delete the snake
-        for row in board:
-            for elem in row:
-                if elem == 'fruit':
-                    # TODO : Portal shouldnt actualy block you if
-                    # you dont have enough fruits
-                    raise IllegalMove()
-        raise MissionComplete()
-
     elif blocker == 'solid' or blocker == 'spikes':
         # No can do
         raise IllegalMove()
@@ -128,7 +127,7 @@ def move_board_state(board, snake, direction):
     else:
         raise NotImplemented(f'blocker_class')
 
-    return board
+    return board, teleports, endpoint
 
 
 if __name__ == '__main__':
@@ -137,7 +136,7 @@ if __name__ == '__main__':
     from textwrap import dedent
     board = load_board(sys.argv[1])
     while True:
-        draw_board(board)
+        draw_board(*board)
         move = input('Choose a move (h for help)')
         if len(move) == 2:
             colors = {
@@ -160,7 +159,7 @@ if __name__ == '__main__':
                 print(f"Invalid direction {direction}")
                 continue
             try:
-                board = move_board_state(board, color, direction)
+                board = move_board_state(*board, color, direction)
             except UnsafeMove:
                 print("This kills the snake")
             except IllegalMove:
