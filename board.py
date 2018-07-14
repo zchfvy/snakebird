@@ -131,7 +131,7 @@ def draw_board(board, teleports, endpoint, color=True):
                 if elem[10] == '0':
                     rowchars.append('\u263A')
                 else:
-                    rowchars.append('\u25A0')
+                    rowchars.append('\u25CF')
                 if color:
                     rowchars.append(COLOR_RST)
             elif elclass == 'block':
