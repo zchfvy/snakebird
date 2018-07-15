@@ -12,8 +12,8 @@ def brd(board):
 def execute(board, moves):
     colors = {
         'r': 'red',
-        'g': 'green',
-        'b': 'blue'}
+        'g': 'grn',
+        'b': 'blu'}
     directions = {
         'w': 'up',
         'a': 'left',

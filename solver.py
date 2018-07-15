@@ -52,8 +52,8 @@ def hash_board(board):
 def make_move(board, teleports, endpoint, move):
     colors = {
         'r': 'red',
-        'g': 'green',
-        'b': 'blue'}
+        'g': 'grn',
+        'b': 'blu'}
     directions = {
         'w': 'up',
         'a': 'left',
@@ -107,6 +107,8 @@ def solve(board, teleports, endpoint):
             for direction in ['w', 'a', 's', 'd']:
                 next_moves.append(color + direction)
 
+        print(next_moves)
+
         for mv in next_moves:
             move = cur_move + mv
             try:
@@ -115,6 +117,7 @@ def solve(board, teleports, endpoint):
             except game.MissionComplete:
                 return move  # Done! Horray
             except (game.InvalidMove, game.IllegalMove, game.UnsafeMove):
+                print('bad')
                 continue
             else:
                 h = hash_board(next_board)

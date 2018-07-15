@@ -345,8 +345,8 @@ if __name__ == '__main__':
         if len(move) == 2:
             colors = {
                 'r': 'red',
-                'g': 'green',
-                'b': 'blue'}
+                'g': 'grn',
+                'b': 'blu'}
             directions = {
                 'w': 'up',
                 'a': 'left',
