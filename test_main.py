@@ -94,6 +94,37 @@ def test_spikes_fall():
     assert result is None
 
 
+def test_spikes_partial_fall():
+    result = None
+    board = brd("""
+        __rrR__
+        ###____
+        ++++___
+        #######
+    """)
+    with pytest.raises(UnsafeMove):
+        result = execute(board, "rd")
+    assert result is None
+
+
+def test_spikes_miss_partial_fall():
+    result = None
+    board = brd("""
+        __rrR__
+        ###____
+        ++++_##
+        #######
+    """)
+    result = execute(board, "rd")
+    desired = brd("""
+        _______
+        ###rrR_
+        ++++_##
+        #######
+    """)
+    assert result == desired
+
+
 def test_finish_fall():
     result = None
     board = brd("""

@@ -107,8 +107,6 @@ def solve(board, teleports, endpoint):
             for direction in ['w', 'a', 's', 'd']:
                 next_moves.append(color + direction)
 
-        print(next_moves)
-
         for mv in next_moves:
             move = cur_move + mv
             try:
@@ -117,7 +115,6 @@ def solve(board, teleports, endpoint):
             except game.MissionComplete:
                 return move  # Done! Horray
             except (game.InvalidMove, game.IllegalMove, game.UnsafeMove):
-                print('bad')
                 continue
             else:
                 h = hash_board(next_board)

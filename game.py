@@ -29,6 +29,7 @@ class NothingLeft(Exception):
 
 def update_gravity(board, teleports, endpoint):
     falling = {}
+    spiked = {}  # Distance snakes will hit spikes at
     deleted = []
     very_far = 1000
     super_far = 10000
@@ -70,6 +71,7 @@ def update_gravity(board, teleports, endpoint):
                 else:
                     # Solid ground!
                     if elem_class == 'snake' and target_class == 'spike':
+                        spiked[elem_id] = t_y - y
                         # Spikes won't help snakes!
                         continue
                     new_fall = t_y - (y+1)
@@ -79,6 +81,8 @@ def update_gravity(board, teleports, endpoint):
     for elem in falling.keys():
         elem_class = elem.split()[0]
         elem_id = ' '.join(elem.split()[0:2])
+        if elem_id in spiked and spiked[elem_id] <= falling[elem_id]:
+            raise UnsafeMove()
         if falling[elem_id] > very_far:
             if elem_class == 'snake':
                 raise UnsafeMove()
