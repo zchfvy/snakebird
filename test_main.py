@@ -135,3 +135,41 @@ def test_finish_fall():
     with pytest.raises(MissionComplete):
         result = execute(board, "rd")
     assert result is None
+
+
+def test_space_snake():
+    result = None
+    board = brd("""
+        _______
+        ___R___
+        ___r___
+        #######
+    """)
+    result = execute(board, "rw")
+    desired = brd("""
+        _______
+        ___R___
+        ___r___
+        #######
+    """)
+    assert result == desired
+
+
+def test_booster_snake():
+    result = None
+    board = brd("""
+        _______
+        ___R___
+        ___r___
+        __ggG__
+        #######
+    """)
+    result = execute(board, "rw")
+    desired = brd("""
+        _______
+        ___R___
+        ___r___
+        __ggG__
+        #######
+    """)
+    assert result == desired

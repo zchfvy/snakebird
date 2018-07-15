@@ -65,7 +65,7 @@ def update_gravity(board, teleports, endpoint):
 
                     continue
                 elif target_class in fallable:
-                    new_fall = falling[target_id]
+                    new_fall = t_y - (y+1) + falling[target_id]
                     falling[elem_id] = min(falling[elem_id], new_fall)
                     break
                 else:
