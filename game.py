@@ -28,6 +28,17 @@ class NothingLeft(Exception):
 
 
 def update_gravity(board, teleports, endpoint):
+
+    # Optimization. Find rows with no object in them
+    interesting_rows = set()
+    interesting_cols = set()
+    for y, row in enumerate(board):
+        for x, elem in enumerate(row):
+            elem_class = elem[0:5]
+            if elem_class in ['snake', 'block']:
+                interesting_rows.add(y)
+                interesting_cols.add(y)
+
     falling = {}
     spiked = {}  # Distance snakes will hit spikes at
     deleted = []
@@ -36,6 +47,8 @@ def update_gravity(board, teleports, endpoint):
     fallable = ['snake', 'block']
     height = len(board)
     for y, row in reversed(list(enumerate(board))):
+        if y not in interesting_rows:
+            continue
         for x, elem in enumerate(row):
             elem_class = elem[0:5]
             if elem_class not in fallable:
@@ -93,6 +106,8 @@ def update_gravity(board, teleports, endpoint):
     # but it is extremely nonperformant
     # board = copy.deepcopy(board)
     for y, row in reversed(list(enumerate(board))):
+        if y not in interesting_rows:
+            continue
         for x, elem in enumerate(row):
             elem_class = elem[0:5]
             if elem_class not in fallable:
