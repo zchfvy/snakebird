@@ -14,6 +14,7 @@ def score_heuristic(board, teleports, endpoint, cur_move):
     cost_final_distance = 1  # Distance cost when no fruit left
     cost_final_distance_furthest = 2  # Extra cost for furthest snake
     cost_move_length = 1  # How many moves we amde to get here
+    cost_elevation = 0.5
 
     score = 0
 
@@ -23,6 +24,7 @@ def score_heuristic(board, teleports, endpoint, cur_move):
             is_head = re.match('^snake ... 0', elem)
             if is_head:
                 score += cost_live_snake
+                score += y * cost_elevation
                 heads.append((y, x))
 
     if game.any_fruit_exists(board):
@@ -157,7 +159,7 @@ def move_to_board(board, teleports, endpoint, moves):
 
 def solve(board, teleports, endpoint):
     # Set of boards already dealt with (hashes of board states)
-    closed_set = set()
+    closed_set = {}
     # Set of boards we need to deal with (priorty queue of move strings)
     open_set = []
     counter = itertools.count()
@@ -174,10 +176,11 @@ def solve(board, teleports, endpoint):
         cur_board, _, _ = move_to_board(board, teleports, endpoint, cur_move)
 
         h = hash_board(cur_board)
-        if h in closed_set:
+        if h in closed_set.keys():
             #print(f"Skipping iteration #{i}. Already evaluated on seperate route.")
-            continue
-        closed_set.add(h)
+            if cur_move >= closed_set[h]:
+                continue  # Only skip if the other move is actualy equal or better
+        closed_set[h] = cur_move
         
         print(gameboard.draw_board(cur_board, teleports, endpoint))
         nmoves = int(len(cur_move) / 2)
@@ -207,7 +210,7 @@ def solve(board, teleports, endpoint):
                 continue
             else:
                 h = hash_board(next_board)
-                if h in closed_set:  # Already seen this state (a loop)
+                if h in closed_set.keys():  # Already seen this state (a loop)
                     continue
                 add_to_cache(move, next_board)
                 score = score_heuristic(next_board, teleports, endpoint, move)
@@ -219,4 +222,5 @@ if __name__ == '__main__':
     board = gameboard.load_file(sys.argv[1])
     print(gameboard.draw_board(*board))
     sol = solve(*board)
-    print(sol)
+    print("Solution Found!")
+    print(pprint_move(sol))
