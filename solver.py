@@ -8,10 +8,11 @@ import hashlib
 
 def score_heuristic(board, teleports, endpoint, cur_move):
     cost_live_snake = 50
-    cost_distance = 0  # Distance cost when fruit are on board
     cost_fruit = 20
     cost_fruit_distance = 2  # Cost of being far from fruit
-    cost_final_distance = 2  # Distance cost when no fruit left
+    cost_fruit_distance_nearest = 4  # Extra cost on nearest snake to fruit
+    cost_final_distance = 1  # Distance cost when no fruit left
+    cost_final_distance_furthest = 2  # Extra cost for furthest snake
     cost_move_length = 1  # How many moves we amde to get here
 
     score = 0
@@ -21,25 +22,28 @@ def score_heuristic(board, teleports, endpoint, cur_move):
         for x, elem in enumerate(row):
             is_head = re.match('^snake ... 0', elem)
             if is_head:
+                score += cost_live_snake
                 heads.append((y, x))
 
-    for y, row in enumerate(board):
-        for x, elem in enumerate(row):
-            is_fruit = elem == 'fruit'
-            if is_fruit:
-                score += cost_fruit
-                fruit = (y, x)
-                for head in heads:
-                    dist = abs(head[0] - fruit[0]) + abs(head[1] - fruit[1])
-                    score += dist * cost_fruit_distance
-
-    for head in heads:
-        score += cost_live_snake
-        dist = abs(head[0] - endpoint[0]) + abs(head[1] - endpoint[1])
-        if game.any_fruit_exists(board):
-            score += dist * cost_distance
-        else:
+    if game.any_fruit_exists(board):
+        nearest_cost = 10000
+        for y, row in enumerate(board):
+            for x, elem in enumerate(row):
+                is_fruit = elem == 'fruit'
+                if is_fruit:
+                    score += cost_fruit
+                    fruit = (y, x)
+                    for head in heads:
+                        dist = abs(head[0] - fruit[0]) + abs(head[1] - fruit[1])
+                        score += dist * cost_fruit_distance
+                        nearest_cost = min(nearest_cost, dist * cost_fruit_distance_nearest)
+    else:
+        furthest_cost = 0
+        for head in heads:
+            dist = abs(head[0] - endpoint[0]) + abs(head[1] - endpoint[1])
             score += dist * cost_final_distance
+            furthest_cost = max(furthest_cost, dist * cost_final_distance_furthest)
+        score += furthest_cost
 
     score += cost_move_length * len(cur_move) / 2
 
