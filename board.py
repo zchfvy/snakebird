@@ -58,7 +58,7 @@ def load_board(board_text):
     teleports = []
     endpoint = None
     rowlen = 0
-    data = board_text.strip('\n').split('\n')
+    data = board_text.strip().split('\n')
     for y, line in enumerate(data):
         row = []
         board.append(row)
