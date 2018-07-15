@@ -112,22 +112,26 @@ def load_board(fname):
 
 
 
-def draw_board(board, teleports, endpoint, color=True):
+def draw_board(board, teleports, endpoint, color=True, fancy=True):
+    if fancy:
+        idx = 2
+    else:
+        idx = 1
     for y, row in enumerate(board):
         rowchars = []
         for x, elem in enumerate(row):
             if elem == 'space':
                 if endpoint == (y, x):
-                    rowchars.append(specials_lut['endpoint'][1])
+                    rowchars.append(specials_lut['endpoint'][idx-1])
                     continue
                 elif (y,x) in teleports:
-                    rowchars.append(specials_lut['teleport'][1])
+                    rowchars.append(specials_lut['teleport'][idx-1])
                     continue
             for brd in boardtable:
                 if elem.startswith(brd[0]):
                     if color and brd[3]:
                         rowchars.append(brd[3])
-                    rowchars.append(brd[2])
+                    rowchars.append(brd[idx])
                     if color and brd[3]:
                         rowchars.append(COLOR_RST)
                     break
