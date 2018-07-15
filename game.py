@@ -23,6 +23,86 @@ class MissionComplete(Exception):
     """We are done!"""
 
 
+def update_gravity(board, endpoints, teleports):
+    falling = {}
+    deleted = []
+    very_far = 1000
+    super_far = 10000
+    fallable = ['snake', 'block']
+    height = len(board)
+    for y, row in reversed(list(enumerate(board))):
+        for x, elem in enumerate(row):
+            elem_class = elem.split()[0]
+            if elem_class not in fallable:
+                continue
+            elem_id = ' '.join(elem.split()[0:2])
+
+            if elem_id not in falling.keys():
+                falling[elem_id] = super_far
+
+            for t_y in range(y+1, height):
+                target = board[t_y][x]
+                target_class = target.split()[0]
+                target_id = ' '.join(target.split()[0:2])
+                
+                if target_id == elem_id:
+                    continue
+
+                if target_class == 'space':
+                    continue
+                elif target_class in fallable:
+                    new_fall = falling[target_id]
+                    falling[elem_id] = min(falling[elem_id], new_fall)
+                    break
+                else:
+                    # Solid ground!
+                    if elem_class == 'snake' and target_class == 'spike':
+                        # Spikes won't help snakes!
+                        continue
+                    new_fall = t_y - (y+1)
+                    falling[elem_id] = min(falling[elem_id], new_fall)
+                    break
+
+    for elem in falling.keys():
+        elem_class = elem.split()[0]
+        elem_id = ' '.join(elem.split()[0:2])
+        print(elem_id, falling[elem_id])
+        if falling[elem_id] > very_far:
+            if elem_class == 'snake':
+                raise UnsafeMove()
+            else:
+                deleted.append(elem_id)
+
+    board = copy.deepcopy(board)
+    for y, row in reversed(list(enumerate(board))):
+        for x, elem in enumerate(row):
+            elem_class = elem.split()[0]
+            if elem_class not in fallable:
+                continue
+            elem_id = ' '.join(elem.split()[0:2])
+
+            if elem_id in deleted:
+                board[y][x] = 'space'
+                continue
+
+            distance = falling[elem_id]
+            if distance == 0:
+                continue
+
+            # snake fixup
+            spl = elem.split()
+            if len(spl) == 5:
+                # We gotta relink a snake as we move it
+                o_y, o_x = [int(s) for s in spl[3:5]]
+                n_x, n_y = str(o_x), str(o_y + distance)
+                elem = ' '.join(spl[0:3] + [n_y, n_x])
+
+            board[y+distance][x] = elem
+            board[y][x] = 'space'
+
+    return board
+
+
 def attempt_push(board, pushed, direction):
     board = copy.deepcopy(board)
     orig_board = copy.deepcopy(board)
@@ -199,6 +279,7 @@ def move_board_state(board, teleports, endpoint, snake, direction):
         # No can do
         raise IllegalMove()
 
+    board = update_gravity(board, teleports, endpoint)
     return board, teleports, endpoint
 
 
