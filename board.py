@@ -8,8 +8,8 @@ class SnakebirdBoardError(Exception):
 
 COLOR_RST = '\033[39m'
 COLOR_RED = '\033[31m'
-COLOR_BLU = '\033[32m'
-COLOR_GRN = '\033[33m'
+COLOR_BLU = '\033[34m'
+COLOR_GRN = '\033[32m'
 COLOR_YEL = '\033[34m'
 COLOR_MAG = '\033[35m'
 COLOR_CYA = '\033[36m'
