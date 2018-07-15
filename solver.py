@@ -172,7 +172,12 @@ def solve(board, teleports, endpoint):
             raise Exception("No solution!")
         cur_score, _, cur_move = heapq.heappop(open_set)
         cur_board, _, _ = move_to_board(board, teleports, endpoint, cur_move)
-        closed_set.add(hash_board(cur_board))
+
+        h = hash_board(cur_board)
+        if h in closed_set:
+            #print(f"Skipping iteration #{i}. Already evaluated on seperate route.")
+            continue
+        closed_set.add(h)
         
         print(gameboard.draw_board(cur_board, teleports, endpoint))
         nmoves = int(len(cur_move) / 2)
