@@ -240,11 +240,11 @@ def move_board_state(board, teleports, endpoint, snake, direction):
 
     if direction == 'left' and x == 0:
         raise InvalidMove(f"Moving off of board {direction}")
-    if direction == 'right' and x == b_x:
+    if direction == 'right' and x == b_x-1:
         raise InvalidMove(f"Moving off of board {direction}")
     if direction == 'up' and y == 0:
         raise InvalidMove(f"Moving off of board {direction}")
-    if direction == 'down' and y == b_y:
+    if direction == 'down' and y == b_y-1:
         raise InvalidMove(f"Moving off of board {direction}")
 
     if direction == 'left':
