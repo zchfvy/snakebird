@@ -7,11 +7,12 @@ import hashlib
 
 
 def score_heuristic(board, teleports, endpoint, cur_move):
-    cost_live_snake = 10
+    cost_live_snake = 50
     cost_distance = 0  # Distance cost when fruit are on board
-    cost_fruit = 10
-    cost_final_distance = 1  # Distance cost when no fruit left
-    cost_move_length = 0.3  # How many moves we amde to get here
+    cost_fruit = 20
+    cost_fruit_distance = 2  # Cost of being far from fruit
+    cost_final_distance = 2  # Distance cost when no fruit left
+    cost_move_length = 1  # How many moves we amde to get here
 
     score = 0
 
@@ -27,16 +28,20 @@ def score_heuristic(board, teleports, endpoint, cur_move):
             is_fruit = elem == 'fruit'
             if is_fruit:
                 score += cost_fruit
+                fruit = (y,x)
+                for head in heads:
+                    dist = abs(head[0] - fruit[0]) + abs(head[1] - fruit[1])
+                    score += dist * cost_fruit_distance
 
     for head in heads:
         score += cost_live_snake
-        dist = (head[0] - endpoint[0]) + (head[1] - endpoint[1])
+        dist = abs(head[0] - endpoint[0]) + abs(head[1] - endpoint[1])
         if game.any_fruit_exists(board):
             score += dist * cost_distance
         else:
             score += dist * cost_final_distance
 
-    score += cost_move_length * len(cur_move)
+    score += cost_move_length * len(cur_move) / 2
 
     return score
 
@@ -94,6 +99,7 @@ def solve(board, teleports, endpoint):
         closed_set.add(hash_board(cur_board))
         
         print(gameboard.draw_board(cur_board, teleports, endpoint))
+        print(cur_score)
 
         # First let's find all snakes and possiblem oves
         colors = []
@@ -120,7 +126,7 @@ def solve(board, teleports, endpoint):
                 h = hash_board(next_board)
                 if h in closed_set:  # Already seen this state (a loop)
                     continue
-                score = score_heuristic(board, teleports, endpoint, move)
+                score = score_heuristic(next_board, teleports, endpoint, move)
                 heapq.heappush(open_set, (score, next(counter), move))
 
 
