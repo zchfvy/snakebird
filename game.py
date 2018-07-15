@@ -89,7 +89,9 @@ def update_gravity(board, teleports, endpoint):
             else:
                 deleted.append(elem_id)
 
-    board = copy.deepcopy(board)
+    # TODO: This line is needed to keep functional purity
+    # but it is extremely nonperformant
+    # board = copy.deepcopy(board)
     for y, row in reversed(list(enumerate(board))):
         for x, elem in enumerate(row):
             elem_class = elem.split()[0]

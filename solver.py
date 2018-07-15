@@ -121,7 +121,9 @@ def solve(board, teleports, endpoint):
     score = score_heuristic(board, teleports, endpoint, '')
     heapq.heappush(open_set, (score, next(counter), ''))
 
+    i = 0
     while True:
+        i += 1
         # Add ourselves to the already seen states
         if len(open_set) == 0:
             raise Exception("No solution!")
@@ -131,7 +133,7 @@ def solve(board, teleports, endpoint):
         
         print(gameboard.draw_board(cur_board, teleports, endpoint))
         nmoves = int(len(cur_move) / 2)
-        print(f"Move #{nmoves}. Score:{cur_score}")
+        print(f"Iteration #{i}. Move #{nmoves}. Score:{cur_score}")
         print(pprint_move(cur_move))
 
         # First let's find all snakes and possiblem oves
