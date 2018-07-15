@@ -102,6 +102,7 @@ def update_gravity(board, teleports, endpoint):
             else:
                 deleted.append(elem_id)
 
+    dirty = False
     # TODO: This line is needed to keep functional purity
     # but it is extremely nonperformant
     # board = copy.deepcopy(board)
@@ -114,12 +115,14 @@ def update_gravity(board, teleports, endpoint):
                 continue
             elem_id = ' '.join(elem.split()[0:2])
 
-            if elem_id in deleted:
-                board[y][x] = 'space'
-                continue
-
             distance = falling[elem_id]
             if distance == 0:
+                continue
+
+            dirty = True
+
+            if elem_id in deleted:
+                board[y][x] = 'space'
                 continue
 
             # snake fixup
@@ -133,7 +136,7 @@ def update_gravity(board, teleports, endpoint):
             board[y+distance][x] = elem
             board[y][x] = 'space'
 
-    return board
+    return board, dirty
 
 
 def attempt_push(board, pushed, direction):
@@ -202,6 +205,8 @@ def attempt_push(board, pushed, direction):
 
 
 def update_end(board, endpoint):
+    dirty = False
+
     board = copy.deepcopy(board)
     if not endpoint:
         return board
@@ -215,12 +220,13 @@ def update_end(board, endpoint):
             removed.append(elem_id)
 
     for rem in removed:
+        dirty = True
         for y, row in enumerate(board):
             for x, elem in enumerate(row):
                 if elem.startswith(rem):
                     board[y][x] = 'space'
 
-    return board
+    return board, dirty
 
 
 def any_fruit_exists(board):
@@ -339,15 +345,17 @@ def move_board_state(board, teleports, endpoint, snake, direction):
         raise IllegalMove()
 
     try:
-        board = update_end(board, endpoint)
+        board , _= update_end(board, endpoint)
     except NothingLeft:
         pass
 
-    from board import draw_board
-
-    for _ in range(5):  # TODO : better way to escape loop
-        board = update_gravity(board, teleports, endpoint)
-        board = update_end(board, endpoint)
+    dirty = True
+    while dirty:
+        dirty = False
+        board, d = update_gravity(board, teleports, endpoint)
+        dirty |= d
+        board, d = update_end(board, endpoint)
+        dirty |= d
 
     if not any_snakes_exist(board):
         raise MissionComplete()
