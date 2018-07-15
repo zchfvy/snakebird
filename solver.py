@@ -28,7 +28,7 @@ def score_heuristic(board, teleports, endpoint, cur_move):
             is_fruit = elem == 'fruit'
             if is_fruit:
                 score += cost_fruit
-                fruit = (y,x)
+                fruit = (y, x)
                 for head in heads:
                     dist = abs(head[0] - fruit[0]) + abs(head[1] - fruit[1])
                     score += dist * cost_fruit_distance
@@ -44,6 +44,33 @@ def score_heuristic(board, teleports, endpoint, cur_move):
     score += cost_move_length * len(cur_move) / 2
 
     return score
+
+
+def pprint_move(move):
+    COLOR_RST = '\033[39m'
+    COLOR_RED = '\033[31m'
+    COLOR_BLU = '\033[34m'
+    COLOR_GRN = '\033[32m'
+    
+    AR_LEFT = "▲"
+    AR_UP = "▼"
+    AR_RIGHT = "◀"
+    AR_DOWN = "▶"
+
+    lut = {
+        'r': COLOR_RED,
+        'g': COLOR_GRN,
+        'b': COLOR_BLU,
+        'w': AR_UP,
+        'a': AR_LEFT,
+        's': AR_DOWN,
+        'd': AR_RIGHT
+    }
+
+    res = []
+    for char in move:
+        res.append(lut[char])
+    return ' '.join(res) + COLOR_RST
 
 
 def hash_board(board):
@@ -99,7 +126,9 @@ def solve(board, teleports, endpoint):
         closed_set.add(hash_board(cur_board))
         
         print(gameboard.draw_board(cur_board, teleports, endpoint))
-        print(cur_score)
+        nmoves = int(len(cur_move) / 2)
+        print(f"Move #{nmoves}. Score:{cur_score}")
+        print(pprint_move(cur_move))
 
         # First let's find all snakes and possiblem oves
         colors = []
