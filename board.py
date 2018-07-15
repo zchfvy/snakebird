@@ -20,7 +20,7 @@ COLOR_CYA = '\033[36m'
 # Symbols are amtched in order fist to last
 # So snake heads have to come before bodies
 boardtable = [
-    ('space',       ' ', ' ',      None),
+    ('space',       '_', ' ',      None),
     ('solid',       '#', '\u2588', None),
     ('spike',       '+', '\u271A', None),
     ('snake red 0', 'R', '\u263A', COLOR_RED),
@@ -45,7 +45,7 @@ specials = [
 specials_lut = {s[0]: s[1:] for s in specials}
 
 # Table of characters to completely ignore
-ignore = ['\n']
+ignore = ['\n', ' ']
 
 
 def load_file(file_name):
