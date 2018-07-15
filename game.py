@@ -140,8 +140,8 @@ def update_gravity(board, teleports, endpoint):
 
 
 def attempt_push(board, pushed, direction):
+    orig_board = board
     board = copy.deepcopy(board)
-    orig_board = copy.deepcopy(board)
 
     if direction == 'down':
         board_orient = reversed(list(enumerate(board)))
