@@ -37,7 +37,7 @@ def update_gravity(board, teleports, endpoint):
     height = len(board)
     for y, row in reversed(list(enumerate(board))):
         for x, elem in enumerate(row):
-            elem_class = elem.split()[0]
+            elem_class = elem[0:5]
             if elem_class not in fallable:
                 continue
             elem_id = ' '.join(elem.split()[0:2])
@@ -94,7 +94,7 @@ def update_gravity(board, teleports, endpoint):
     # board = copy.deepcopy(board)
     for y, row in reversed(list(enumerate(board))):
         for x, elem in enumerate(row):
-            elem_class = elem.split()[0]
+            elem_class = elem[0:5]
             if elem_class not in fallable:
                 continue
             elem_id = ' '.join(elem.split()[0:2])
