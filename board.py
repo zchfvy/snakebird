@@ -53,7 +53,7 @@ def load_file(file_name):
         return load_board(f.read())
 
 
-def load_board(board_text, padding=3):
+def load_board(board_text, padding=1):
     board = []
     teleports = []
     endpoint = None
