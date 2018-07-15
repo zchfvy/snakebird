@@ -51,7 +51,7 @@ def update_gravity(board, teleports, endpoint):
                 target_id = ' '.join(target.split()[0:2])
 
                 if target_id == elem_id:
-                    continue
+                    break
 
                 if target_class == 'space':
                     # Special cases
@@ -73,7 +73,7 @@ def update_gravity(board, teleports, endpoint):
                     if elem_class == 'snake' and target_class == 'spike':
                         spiked[elem_id] = t_y - y
                         # Spikes won't help snakes!
-                        continue
+                        break
                     new_fall = t_y - (y+1)
                     falling[elem_id] = min(falling[elem_id], new_fall)
                     break

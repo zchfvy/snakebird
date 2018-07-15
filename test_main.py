@@ -173,3 +173,31 @@ def test_booster_snake():
         #######
     """)
     assert result == desired
+
+
+def test_spikedrop_f():
+    result = None
+    board = brd("""
+        _______
+        __rR___
+        ###____
+        ###+___
+        #######
+    """)
+    with pytest.raises(UnsafeMove):
+        result = execute(board, "rs")
+    assert result is None
+
+
+def test_spikedrop_b():
+    result = None
+    board = brd("""
+        _______
+        __rR___
+        ###____
+        ###+___
+        #######
+    """)
+    with pytest.raises(UnsafeMove):
+        result = execute(board, "rw")
+    assert result is None
