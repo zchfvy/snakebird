@@ -19,7 +19,7 @@ def execute(board, moves):
         'a': 'left',
         's': 'down',
         'd': 'right'}
-    board, teleports, endpoint = load_board(board)
+    board, teleports, endpoint = load_board(board, padding=0)
     for snake, direction in zip(moves[0::2], moves[1::2]):
         board, teleports, endpoint = move_board_state(
                 board, teleports, endpoint,

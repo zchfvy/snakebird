@@ -53,7 +53,7 @@ def load_file(file_name):
         return load_board(f.read())
 
 
-def load_board(board_text):
+def load_board(board_text, padding=3):
     board = []
     teleports = []
     endpoint = None
@@ -83,6 +83,23 @@ def load_board(board_text):
                         raise SnakebirdBoardError(f"Unknown char '{char}'")
         rowlen = len(row)
     numrows = len(board)
+
+    # Add padding
+    for row in board:
+        for _ in range(padding):
+            row.insert(0, 'space')
+            row.append('space')
+    rowlen += padding * 2
+    for _ in range(padding):
+        board.insert(0, ['space'] * rowlen)
+        board.append(['space'] * rowlen)
+    numrows += padding * 2
+    if endpoint:
+        endpoint = (endpoint[0] + padding, endpoint[1] + padding)
+    newtel = []
+    for t in teleports:
+        newtel.append((t[0] + padding, t[1] + padding))
+    teleports = newtel
 
     heads = []
     for y, line in enumerate(board):
