@@ -209,7 +209,7 @@ def update_end(board, endpoint):
 
     board = copy.deepcopy(board)
     if not endpoint:
-        return board
+        return board, False
     elem = board[endpoint[0]][endpoint[1]]
     elem_cls = elem.split()[0]
     removed = []
