@@ -105,7 +105,50 @@ def make_move(board, teleports, endpoint, move):
     return board, teleports, endpoint
 
 
+cache = {}
+evict = []
+c_size = 250
+
+def check_board_cache(move):
+    global cache
+    global evict
+    result = None
+    while move:
+        if result:
+            if move in evict:
+                evict.remove(move)
+                evict.insert(0, move)
+        elif move in cache.keys():
+            result = move, cache[move]
+        move = move[:-2]
+
+    return result
+
+
+def add_to_cache(move, board):
+    global cache
+    global evict
+    if move in evict:
+        evict.remove(move)
+        evict.insert(0, move)
+        return
+
+    cache[move] = board
+    evict.insert(0, move)
+
+    if len(evict) > c_size:
+        for evicted in evict[c_size:]:
+            del cache[evicted]
+        evict = evict[:c_size]
+
+
 def move_to_board(board, teleports, endpoint, moves):
+    cached = check_board_cache(moves)
+    if cached:
+        board = cached[1]
+        c_moves = cached[0]
+        moves = moves[len(c_moves):]
+
     for move in zip(moves[0::2], moves[1::2]):
         board, teleports, endpoint = make_move(board, teleports, endpoint, move)
 
@@ -161,6 +204,7 @@ def solve(board, teleports, endpoint):
                 h = hash_board(next_board)
                 if h in closed_set:  # Already seen this state (a loop)
                     continue
+                add_to_cache(move, next_board)
                 score = score_heuristic(next_board, teleports, endpoint, move)
                 heapq.heappush(open_set, (score, next(counter), move))
 
