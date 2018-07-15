@@ -23,7 +23,11 @@ class MissionComplete(Exception):
     """We are done!"""
 
 
-def update_gravity(board, endpoints, teleports):
+class NothingLeft(Exception):
+    """Indicates nothign left to do in a step."""
+
+
+def update_gravity(board, teleports, endpoint):
     falling = {}
     deleted = []
     very_far = 1000
@@ -44,11 +48,20 @@ def update_gravity(board, endpoints, teleports):
                 target = board[t_y][x]
                 target_class = target.split()[0]
                 target_id = ' '.join(target.split()[0:2])
-                
+
                 if target_id == elem_id:
                     continue
 
                 if target_class == 'space':
+                    # Special cases
+                    if elem_class == 'snake':
+                        # Fall into endpoint
+                        is_head = elem.split()[2] == '0'
+                        if is_head and endpoint == (t_y, x):
+                            new_fall = t_y - y
+                            falling[elem_id] = min(falling[elem_id], new_fall)
+                        # TODO: teleport
+
                     continue
                 elif target_class in fallable:
                     new_fall = falling[target_id]
@@ -66,7 +79,6 @@ def update_gravity(board, endpoints, teleports):
     for elem in falling.keys():
         elem_class = elem.split()[0]
         elem_id = ' '.join(elem.split()[0:2])
-        print(elem_id, falling[elem_id])
         if falling[elem_id] > very_far:
             if elem_class == 'snake':
                 raise UnsafeMove()
@@ -168,6 +180,44 @@ def attempt_push(board, pushed, direction):
     return board
 
 
+def update_end(board, endpoint):
+    board = copy.deepcopy(board)
+    if not endpoint:
+        return board
+    elem = board[endpoint[0]][endpoint[1]]
+    elem_cls = elem.split()[0]
+    removed = []
+    if elem_cls == 'snake':
+        is_head = elem.split()[2] == '0'
+        if is_head and not any_fruit_exists(board):
+            elem_id = ' '.join(elem.split()[0:2])
+            removed.append(elem_id)
+
+    for rem in removed:
+        for y, row in enumerate(board):
+            for x, elem in enumerate(row):
+                if elem.startswith(rem):
+                    board[y][x] = 'space'
+
+    return board
+
+
+def any_fruit_exists(board):
+    for row in board:
+        for elem in row:
+            if elem == 'fruit':
+                return True
+    return False
+
+
+def any_snakes_exist(board):
+    for row in board:
+        for elem in row:
+            if elem.startswith('snake'):
+                return True
+    return False
+
+
 def move_board_state(board, teleports, endpoint, snake, direction):
     board = copy.deepcopy(board)
     b_x, b_y = len(board[0]), len(board)
@@ -240,18 +290,6 @@ def move_board_state(board, teleports, endpoint, snake, direction):
         blocker = 'space'
 
     if blocker == 'space':
-
-        # First check if this sapce contains the endpoint, adn do that
-        # logic
-        if (t_y, t_x) == endpoint:
-            fruits_left = 0
-            for row in board:
-                for elem in row:
-                    if elem == 'fruit':
-                        fruits_left += 1
-            if fruits_left == 0:
-                raise MissionComplete()
-
         # We advance the snake's head
         segment = 0
         board[t_y][t_x] = f'snake {snake} {segment} {y} {x}'
@@ -279,7 +317,20 @@ def move_board_state(board, teleports, endpoint, snake, direction):
         # No can do
         raise IllegalMove()
 
-    board = update_gravity(board, teleports, endpoint)
+    try:
+        board = update_end(board, endpoint)
+    except NothingLeft:
+        pass
+
+    from board import draw_board
+
+    for _ in range(5):  # TODO : better way to escape loop
+        board = update_gravity(board, teleports, endpoint)
+        board = update_end(board, endpoint)
+
+    if not any_snakes_exist(board):
+        raise MissionComplete()
+
     return board, teleports, endpoint
 
 

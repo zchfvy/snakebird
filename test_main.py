@@ -92,3 +92,15 @@ def test_spikes_fall():
     with pytest.raises(UnsafeMove):
         result = execute(board, "rd")
     assert result is None
+
+
+def test_finish_fall():
+    result = None
+    board = brd("""
+        __rrR__
+        ###__O_
+        _______
+    """)
+    with pytest.raises(MissionComplete):
+        result = execute(board, "rd")
+    assert result is None
