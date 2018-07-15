@@ -48,44 +48,48 @@ specials_lut = {s[0]: s[1:] for s in specials}
 ignore = ['\n']
 
 
-def load_board(fname):
+def load_file(file_name):
+    with open(file_name, 'r') as f:
+        return load_board(f.read())
+
+
+def load_board(board_text):
     board = []
     teleports = []
     endpoint = None
     rowlen = 0
-    with open(fname, 'r') as f:
-        for y, line in enumerate(f):
-            row = []
-            board.append(row)
-            print('')
-            for x, char in enumerate(line):
-                for spc in specials:
-                    if spc[1] == char:
-                        row.append('space')
-                        if spc[0] == 'teleport':
-                            teleports.append((y,x))
-                        if spc[0] == 'endpoint':
-                            if endpoint is not None:
-                                raise SnakebirdBoardError("Multiple Endpoints")
-                            endpoint = (y, x)
+    data = board_text.strip('\n').split('\n')
+    for y, line in enumerate(data):
+        row = []
+        board.append(row)
+        for x, char in enumerate(line):
+            for spc in specials:
+                if spc[1] == char:
+                    row.append('space')
+                    if spc[0] == 'teleport':
+                        teleports.append((y,x))
+                    if spc[0] == 'endpoint':
+                        if endpoint is not None:
+                            raise SnakebirdBoardError("Multiple Endpoints")
+                        endpoint = (y, x)
+                    break
+            else:
+                for brd in boardtable:
+                    if brd[1] == char:
+                        row.append(brd[0])
                         break
                 else:
-                    for brd in boardtable:
-                        if brd[1] == char:
-                            print(brd[0], end=' ')
-                            row.append(brd[0])
-                            break
-                    else:
-                        if char not in ignore:
-                            raise SnakebirdBoardError(f"Unknown char '{char}'")
-            rowlen = len(row)
-        numrows = len(board)
+                    if char not in ignore:
+                        raise SnakebirdBoardError(f"Unknown char '{char}'")
+        rowlen = len(row)
+    numrows = len(board)
 
     heads = []
     for y, line in enumerate(board):
         for x, elem in enumerate(line):
             if elem in['snake red 0', 'snake grn 0', 'snake blu 0']:
                 heads.append((y,x))
+
     for y, x in heads:
         snake = board[y][x][6:9]
         index = 0
@@ -142,5 +146,5 @@ def draw_board(board, teleports, endpoint, color=True, fancy=True):
 
 if __name__ == '__main__':
     import sys
-    board = load_board(sys.argv[1])
+    board = load_file(sys.argv[1])
     print(draw_board(*board))

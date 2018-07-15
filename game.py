@@ -204,9 +204,9 @@ def move_board_state(board, teleports, endpoint, snake, direction):
 
 if __name__ == '__main__':
     import sys
-    from board import load_board, draw_board
+    from board import load_file, draw_board
     from textwrap import dedent
-    board = load_board(sys.argv[1])
+    board = load_file(sys.argv[1])
     while True:
         print(draw_board(*board))
         move = input('Choose a move (h for help)')
