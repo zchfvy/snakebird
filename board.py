@@ -113,6 +113,7 @@ def load_board(fname):
 
 
 def draw_board(board, teleports, endpoint, color=True, fancy=True):
+    res = []
     if fancy:
         idx = 2
     else:
@@ -135,10 +136,11 @@ def draw_board(board, teleports, endpoint, color=True, fancy=True):
                     if color and brd[3]:
                         rowchars.append(COLOR_RST)
                     break
-        print(''.join(rowchars))
+        res.append(''.join(rowchars))
+    return '\n'.join(res)
 
 
 if __name__ == '__main__':
     import sys
     board = load_board(sys.argv[1])
-    draw_board(*board)
+    print(draw_board(*board))

@@ -208,7 +208,7 @@ if __name__ == '__main__':
     from textwrap import dedent
     board = load_board(sys.argv[1])
     while True:
-        draw_board(*board)
+        print(draw_board(*board))
         move = input('Choose a move (h for help)')
         if len(move) == 2:
             colors = {
