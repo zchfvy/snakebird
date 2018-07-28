@@ -328,8 +328,8 @@ def move_board_state(board, teleports, endpoint, snake, direction):
                 next_y = int(snake_parts[3])
                 next_x = int(snake_parts[4])
                 next_seg = board[next_y][next_x]
-                if int(snake_parts[2]) > 10:
-                    exit(1)
+                if int(snake_parts[2]) > 100:
+                    raise Exception("Snake Overflow")
                 if len(next_seg.split()) < 5:
                     board[y][x] = f'snake {snake} {segment}'
                 else:
